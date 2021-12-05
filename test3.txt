@@ -1,0 +1,572 @@
+/*
+입력 받은 일차원 배열의 원소 개수를 함수 make1dArray()에 전달하면, 함수 make1dArray()는
+전달 받은 원소 갯수 만큼 동적으로 메모리를 할당 받아 랜덤으로 100보다 적은 값으로 메모리를 초기화 시킨후,
+주소값을 반환단다. (즉 함수 호출로 1차원 배열 만들기)
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int *make1dArray(int num);
+int main(void)
+{
+	int *ipp;
+	int i, num;
+
+	printf("일차원 배열의 수를 입력하세요 : ");
+	scanf("%d", &num);
+
+	ipp = make1dArray(num);
+
+	for (i = 0; i < num; i++) printf("ipp[%d] =%d ", i, ipp[i]);
+	
+	free(ipp);
+	return 0;
+}
+
+int *make1dArray(int num)
+{
+	int *ary = (int *)malloc(sizeof(int) *num);
+	int i;
+	srand(time(NULL));
+	for (i = 0; i < num; i++) ary[i] = rand() % 100; 
+
+	return ary;
+}
+
+//gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//일차원 배열의 수를 입력하세요 : 5
+//ipp[0] =7 ipp[1] =49 ipp[2] =73 ipp[3] =58 ipp[4] =30 % 
+
+/*입력 받은 이차원 배열의 행의 수와 열의 수를 함수 make2dArray()에 전달하면, 함수 make2dArray()는
+전달 받은 원소 갯수 만큼 동적으로 메모리를 할당 받아 램덤으로 100보다 적은 값으로 메모리를 초기화 시킨 후 , 
+주소값을 반환한다.(즉 함수 호출로 2차원 배열 만들기) 프로그램을 작성하고 반환 직전에 변수값을 디버깅하세요.*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int **make2dArray(int rows, int cols);
+
+int main(void)
+{
+	int **ipp;
+	int i, j, rows, cols;
+
+	printf("이차원 배열의 행과 열의 수를 입력 하세요 : "); 
+	scanf("%d %d",&rows, &cols); 
+
+	ipp = make2dArray(rows, cols);
+
+	for(i=0; i<rows; i++){
+		for(j=0; j<cols; j++){
+			printf("ipp[%d] =%d ", i, ipp[i][j]);
+		}
+	}
+	
+	for (int i = 0; i < rows; i++)    // 세로 크기만큼 반복
+    {
+        free(ipp[i]);                  // 2차원 배열의 가로 공간 메모리 해제
+    }
+	free(ipp);
+
+	return 0; // break point 설정
+}
+
+int **make2dArray(int rows, int cols)
+{
+	int i,j;
+	int **ary;
+	srand(time(NULL));
+ 
+	ary=(int**)malloc(sizeof(int*)*rows);
+
+    for(i=0; i<rows; i++)
+        ary[i] = (int*)malloc(sizeof(int)*cols);
+ 
+    for(i=0; i<rows; i++)
+    {
+        for(j=0; j<cols; j++)
+        {
+            ary[i][j] = rand() % 100;
+        }
+    }
+ 
+	return ary;
+}
+
+//gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//이차원 배열의 행과 열의 수를 입력 하세요 : 2 3
+//ipp[0] =17 ipp[0] =4 ipp[0] =98 ipp[1] =28 ipp[1] =93 ipp[1] =83 %                                        
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//이차원 배열의 행과 열의 수를 입력 하세요 : 2 3
+//ipp[0] =66 ipp[0] =0 ipp[0] =27 ipp[1] =46 ipp[1] =15 ipp[1] =40 %                                        
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//이차원 배열의 행과 열의 수를 입력 하세요 : 2 3
+//ipp[0] =94 ipp[0] =49 ipp[0] =78 ipp[1] =84 ipp[1] =41 ipp[1] =81 %                                       
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//이차원 배열의 행과 열의 수를 입력 하세요 : 2 3
+
+/*
+ 이차원 배열의 합을 구하는 프로그램이다. [2차원 배열을 함수로 전달] 정적배열, 
+ 동적배 열을 함수로 전달하는 방법을 비교하는 프로그램이다. 함수의 파라미터 타입에 주의하면서 
+ 프 로그램을 작성하라. 디버깅 창을 출력하고, 동적배열을 sumAry2D_f1의 인자로 전달할 수 없는 이유를 쓰시오.
+*/
+printf("정적배열은 크기가 정해져 있고, 동적배열은 크기를 할당해줄 수 있기 떄문");
+#include <stdio.h>
+#include <stdlib.h>
+
+// 정적배열 전달
+int sumAry2D_f1( int ary[][3], int rows, int cols ); // 배열 파라미터
+int sumAry2D_f2( int (*ary)[3], int rows, int cols ); // 배열 포인터
+int sumAry2D_f3( int ary[2][3], int rows, int cols );
+
+// 동적 배열 전달 
+int sumAry2D_f4( int **ary, int rows, int cols ); // int ** 
+int sumAry2D_f5( int ***ary, int rows, int cols );// int ***
+
+void freeAry2D(int **ary, int rows);
+
+int main(void)
+{
+	//정적배열(2행 3열)
+	int ary2D[][3] = {{1,2,3},{4,5,6}};
+
+	//동적배열(2행 3열)
+	int r,c,i;
+	int **ary=(int **)malloc(sizeof(int*)*2);
+	for(r = 0; r < 2; r++)
+		ary[r]=(int*)malloc(sizeof(int)*3);
+
+	for(r = 0; r < 2; r++)
+		for(c = 0; c < 3; c ++)
+			ary[r][c]=r+c;
+	
+
+	//정적배열
+	printf("sumAry2D_f1() %d \n", sumAry2D_f1(ary2D,2,3));
+	printf("sumAry2D_f2() %d \n", sumAry2D_f2(ary2D,2,3));
+	printf("sumAry2D_f3() %d \n", sumAry2D_f3(ary2D,2,3));
+
+	////동적배열
+	printf("sumAry2D_f4() %d \n", sumAry2D_f4(ary,2,3));
+	printf("sumAry2D_f5() %d \n", sumAry2D_f5(&ary,2,3));
+
+	freeAry2D(ary,2);
+}
+
+// 정적배열 전달
+int sumAry2D_f1( int ary[][3], int rows, int cols)
+{
+	int i,j,sum=0;
+
+	for(i = 0; i < rows; i++){
+		for(j = 0; j < cols; j++){
+			sum += ary[i][j];
+		}
+	}
+	return sum;
+}
+int sumAry2D_f2( int (*ary)[3], int rows, int cols ) // 배열 포인터
+{
+	int i,j,sum=0;
+
+	for(i = 0; i < rows; i++){
+		for(j = 0; j < cols; j++){
+			sum += *(*(ary + i)+j);
+		}
+	}
+	return sum;
+}
+int sumAry2D_f3( int ary[2][3], int rows, int cols)
+{
+	int i,j,sum=0;
+
+	for(i = 0; i < rows; i++){
+		for(j = 0; j < cols; j++){
+			sum += ary[i][j];
+		}
+	}
+	return sum;
+}
+
+// 동적 배열 전달 
+int sumAry2D_f4( int **ary, int rows, int cols )
+{
+	int i,j;
+	int sum=0;
+
+	ary = (int**)malloc(sizeof(int*)*rows);
+
+	for(i = 0; i < rows; i++)
+		ary[i] = (int*)malloc(sizeof(int*)*cols);
+		
+	for(i = 0; i < rows; i++){
+		for(j = 0; j < cols; j++){
+			sum += (ary[i][j] += i + j);
+		}
+	}
+	return sum;
+
+	
+}
+int sumAry2D_f5( int ***ary, int rows, int cols )
+{
+	int i, j, sum = 0;
+
+	//ary = (int***)malloc(sizeof(int*)*rows);
+	//for(i = 0; i < rows; i++){
+	//	ary[i] = (int**)malloc(sizeof(int*)*cols);
+	//}
+	
+	for (i = 0; i < rows; i++){
+		for(j = 0; j < cols; j++){
+			 sum = sum + (*ary)[i][j];
+		}
+	}
+	
+	return sum;
+}	
+void freeAry2D(int **ary, int rows)
+{
+	int i, j;
+
+	for(i = 0; i < rows; i++){
+		free(ary[i]);
+	}
+	free(ary);
+}
+
+//gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//sumAry2D_f1() 21 
+//sumAry2D_f2() 21 
+//sumAry2D_f3() 21 
+//sumAry2D_f4() 9 
+//sumAry2D_f5() 9 
+
+/*4. [구조체] 다음 코드를 이용하여, 실행 예와 같은 결과를 나타내는 프로그램을 작성하라.
+ 단 humansEqual 함수를 다음과 같이 수정하여 사용해야 한다. (1점)
+수정된 함수원형 : int humansEqual(humanBing *person1, humanBeing *person2);
+*/
+
+#include <stdio.h>
+#include <string.h> //strcmp 
+
+#define TRUE 1
+#define FALSE 0
+
+typedef struct{
+	char name[20];
+	int age;
+	double salary;
+} humanBeing;
+
+int humansEqual(humanBeing *person1, humanBeing *person2);
+
+int main()
+{
+	humanBeing person1;
+	printf("1번 사람 Name, age, salary:\n");
+	scanf("%s", person1.name);                  
+	scanf("%d", &person1.age);
+	scanf("%lf", &person1.salary);
+
+	humanBeing person2;
+	printf("2번 사람 Name, age, salary:\n");
+	scanf("%s", person2.name);                  
+	scanf("%d", &person2.age);
+	scanf("%lf", &person2.salary);
+
+	if (humansEqual(&person1, &person2))                           
+		printf("The two human beings are the same\n");
+	else
+		printf("The two human beings are not the same\n");
+
+	return 0;
+}
+
+
+int humansEqual(humanBeing *person1, humanBeing *person2)
+{
+	if(strcmp(person1->name, person2->name))
+		return FALSE;
+	if(person1->age != person2->age)
+		return FALSE;
+	if(person1->salary != person2->salary)
+		return FALSE;
+
+	return TRUE;
+}
+
+//angdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//1번 사람 Name, age, salary:
+//daechan 20 0
+//2번 사람 Name, age, salary:
+//daechan 20 0
+//The two human beings are the same
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//1번 사람 Name, age, salary:
+//daechan 20 0
+//2번 사람 Name, age, salary:
+//minsu 30 500
+//The two human beings are not the same
+
+
+/*
+[프로그램설명]
+1 각 다항식을 사용자로부터 키보드 입력을 받음 2 다항식을 출력하는 함수를 정의하여 사용하기
+void poly_print(char [], polynomial);
+*/
+
+#include <stdio.h>  
+
+#define MAX_DEGREE 101
+
+typedef struct{  
+   int degree; // 차수  
+   double coef[MAX_DEGREE]; // 계수  
+}polynomial;  
+
+polynomial poly_add(polynomial A, polynomial B);
+
+int main(void)  
+{  
+   int i, j;  
+   polynomial A, B, C;  
+   printf("A다항식의 차수 입력 :");  
+   scanf("%d", &A.degree);  
+   printf("A다항식의 계수 입력 : ");  
+   for(i=0;i<(A.degree+1);i++)  
+      scanf("%lf", &A.coef[i]);  
+   printf("B다항식의 차수 입력 : ");  
+   scanf("%d", &B.degree);  
+   printf("B다항식의 계수 입력 : ");  
+   for(i=0;i<(B.degree+1);i++)  
+      scanf("%lf", &B.coef[i]);  
+ 	
+   printf("A(x) : ");  
+   for(i=0, j=A.degree ; i<=A.degree ; i++,j--)  
+   {  
+        printf("%gx^%d", A.coef[i], j);  
+        if(j!=0)  
+           printf(" + ");  
+   }  
+    printf("\n");
+
+	printf("B(x) : ");  
+   for(i=0, j=B.degree ; i<=B.degree ; i++,j--)  
+   {  
+        printf("%gx^%d", B.coef[i], j);  
+        if(j!=0)  
+           printf(" + ");  
+   }  
+   printf("\n");
+
+   printf("C(x) : ");  
+   C = poly_add(A, B);  
+   for(i=0, j=C.degree ; i<=C.degree ; i++,j--)  
+   {  
+        printf("%gx^%d", C.coef[i], j);  
+        if(j!=0)  
+           printf(" + ");  
+    }  
+
+	return 0;
+}  
+
+polynomial poly_add(polynomial A, polynomial B)  
+{  
+   polynomial C;  
+   int A_pos=0, B_pos=0, C_pos=0;  
+   int degree_a = A.degree;  
+   int degree_b = B.degree;  
+
+   while(degree_a>=0 && degree_b>=0)  
+   {  
+        if(degree_a>degree_b)  
+        {  
+             C.coef[C_pos] = A.coef[A_pos];  
+             A_pos++, C_pos++, degree_a--;  
+       }  
+       else if(degree_a==degree_b)  
+       {  
+            C.coef[C_pos] = A.coef[A_pos]+B.coef[B_pos];  
+            A_pos++, B_pos++, C_pos++, degree_a--, degree_b--;  
+      }  
+      else  
+      {  
+           C.coef[C_pos] = B.coef[B_pos];  
+           B_pos++, C_pos++, degree_b--;  
+      }  
+    }  
+ 	if(degree_a>degree_b)  
+    	C.degree = A.degree;  
+ 	else   
+    	C.degree = B.degree;  
+ 	
+	return C;  
+}  
+\\gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+\\gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+\\A다항식의 차수 입력 :3
+\\A다항식의 계수 입력 : 1 2 3 4
+\\B다항식의 차수 입력 : 4
+\\B다항식의 계수 입력 : 1 2 3 4 5
+\\A(x) : 1x^3 + 2x^2 + 3x^1 + 4x^0
+\\B(x) : 1x^4 + 2x^3 + 3x^2 + 4x^1 + 5x^0
+\\C(x) : 1x^4 + 3x^3 + 5x^2 + 7x^1 + 9x^0% 
+
+
+/*
+6. 다항식을 다음 같이 표현 하는 방식을 이용하여, 두 다항식을 입력받아 더한 후 
+그 결과를 출력하는 프로그램을 작성하라.
+
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+#define COMPARE(x,y) ((x) < (y)) ? -1 : ((x) == (y) ? 0 : 1)
+#define MAX_TERMS 100
+#define EXIT_FALURE 1
+
+typedef struct {
+	float coef; //계수
+	int expon; //지수
+} term;
+
+term terms[MAX_TERMS];
+int avail = 0;
+
+void attach(float coefficient, int exponent);
+void padd(int startA, int finishA, int startB, int finishB, int *startD, int *finishD);
+void print(int *start, int *finish);
+
+int main(void)
+{
+	int i, j;
+	int startA, finishA, startB, finishB, startD, finishD;
+
+	printf("<<D(x) = A(x) + B(x)>> \n");
+	printf("Input the number of items of A(x) : ");
+	scanf(" %d",&finishA);
+	
+	printf("Input the number of items of B(x) : ");
+	scanf(" %d",&finishB);
+
+	printf("\n\nInput in descending order\n");
+	
+	startA = 0;
+	printf("coefficient and exponent of A(x)=10x2+8x^2+3 (10 3, 8 2, 3 0) : ");
+	for (int i = 0; i < finishA; i++) {
+		scanf(" %f %d", &terms[i].coef, &terms[i].expon);
+	}
+	finishA -= 1; 
+	
+	startB = finishA+1;	//a 배열 담칸 부터
+	printf("coefficient and exponent of B(x)=10x2+8x^2+3 (10 3, 8 2, 3 0) : ");
+	for (int i = 0; i < finishB;i++) {
+		scanf(" %f %d",&terms[startB+i].coef,&terms[startB+i].expon);
+	}
+	finishB = startB + finishB - 1;
+	
+	padd(startA, finishA, startB, finishB, &startD, &finishD);
+	printf("A(x) = ");
+	print(&startA, &finishA);
+	printf("\n");
+	printf("B(x) = ");
+	print(&startB, &finishB);
+	printf("\n");
+	printf("D(x) = ");
+	print(&startD, &finishD);
+	
+}
+
+void padd(int startA, int finishA, int startB, int finishB, int *startD, int *finishD)
+{
+	float coefficient;
+	*startD = avail;
+
+	while (startA <= finishA && startB <= finishB)
+		switch(COMPARE(terms[startA].expon,
+					   terms[startB].expon)){
+			case -1: 
+				attach(terms[startB].coef,terms[startB].expon);	
+				startB++;
+				break;
+			case 0:
+				coefficient = terms[startA].coef + 
+							  terms[startB].coef;
+				if(coefficient)
+					attach(coefficient, terms[startA].expon);
+				startA++;
+				startB++;
+				break;
+			case 1:
+				attach(terms[startA].coef,terms[startA].expon);
+				startA++;
+		}
+
+	for(; startA <= finishA; startA++){
+		attach(terms[startA].coef,terms[startA].expon);
+	}
+	for(; startB <= finishB; startB++){
+		attach(terms[startB].coef, terms[startB].expon);
+	}
+	*finishD = avail-1;
+}
+
+void attach(float coefficient, int exponent)
+{
+	if (avail >= MAX_TERMS){
+		fprintf(stderr,"Too many terms in the polynomaial \n");
+		exit(EXIT_FALURE);
+	}
+	terms[avail].coef = coefficient;
+	terms[avail++].expon = exponent;
+}
+
+void print(int *start, int *finish)
+{
+	for (int i = *start; i <= *finish; i++) {
+		if (terms[i].expon != 0) {
+			printf("%fx^%d +", terms[i].coef, terms[i].expon);
+		}
+		else {
+			printf("%f", terms[i].coef);
+		}
+	}
+
+}
+
+
+
+//<<D(x) = A(x) + B(x)>> 
+//Input the number of items of A(x) : 5
+//Input the number of items of B(x) : 3
+//
+//gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//<<D(x) = A(x) + B(x)>> 
+//Input the number of items of A(x) : 5
+//Input the number of items of B(x) : 3
+//
+//
+//Input in descending order
+//coefficient and exponent of A(x)=10x2+8x^2+3 (10 3, 8 2, 3 0) : 11 9
+//9 5
+//7 2
+//9 0
+//
+//
+//3 3
+//coefficient and exponent of B(x)=10x2+8x^2+3 (10 3, 8 2, 3 0) : 10 9
+//5 3
+//5 2
+//A(x) = 21.000000x^9 +9.000000x^5 +5.000000x^3 +5.000000x^3 +5.000000x^3 +
+//B(x) = 5.000000x^3 +5.000000x^2 +5.000000x^2 +
+//D(x) = 21.000000x^9 +9.000000x^5 +5.000000x^3 +5.000000x^3 +5.000000x^3 +5.000000x^3 +5.000000x^2 +% 
