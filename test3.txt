@@ -440,7 +440,7 @@ typedef struct {
 } term;
 
 term terms[MAX_TERMS];
-int avail = 0;
+int avail = 0; 
 
 void attach(float coefficient, int exponent);
 void padd(int startA, int finishA, int startB, int finishB, int *startD, int *finishD);
@@ -487,34 +487,34 @@ int main(void)
 }
 
 void padd(int startA, int finishA, int startB, int finishB, int *startD, int *finishD)
-{
+{// a + b = d
 	float coefficient;
 	*startD = avail;
 
 	while (startA <= finishA && startB <= finishB)
 		switch(COMPARE(terms[startA].expon,
 					   terms[startB].expon)){
-			case -1: 
+			case -1: //a 지수가 b지수보다 작을경우에 b 1칸 증가시켜줌
 				attach(terms[startB].coef,terms[startB].expon);	
 				startB++;
 				break;
-			case 0:
+			case 0: //지수가 같은 경우 계수 더해줌
 				coefficient = terms[startA].coef + 
 							  terms[startB].coef;
 				if(coefficient)
-					attach(coefficient, terms[startA].expon);
+					attach(coefficient, terms[startA].expon); //0인지 확인하고 아니라면 +
 				startA++;
 				startB++;
 				break;
-			case 1:
+			case 1: // a지수가 b지수보다 큰 경우에 a배열 1 더해줌
 				attach(terms[startA].coef,terms[startA].expon);
 				startA++;
 		}
 
-	for(; startA <= finishA; startA++){
+	for(; startA <= finishA; startA++){//에 항들 넣는다
 		attach(terms[startA].coef,terms[startA].expon);
 	}
-	for(; startB <= finishB; startB++){
+	for(; startB <= finishB; startB++){ //시작b부터 끝b까지 지우면서 붙여감
 		attach(terms[startB].coef, terms[startB].expon);
 	}
 	*finishD = avail-1;
@@ -522,14 +522,16 @@ void padd(int startA, int finishA, int startB, int finishB, int *startD, int *fi
 
 void attach(float coefficient, int exponent)
 {
-	if (avail >= MAX_TERMS){
+	// 새로운 항을 다항식에 첨가
+	if (avail >= MAX_TERMS){ //max값보다 많으면 애러 출력 
 		fprintf(stderr,"Too many terms in the polynomaial \n");
 		exit(EXIT_FALURE);
 	}
-	terms[avail].coef = coefficient;
-	terms[avail++].expon = exponent;
+	terms[avail].coef = coefficient; //계수 넣어주고
+	terms[avail++].expon = exponent; //지수 넣어주고 뒤로 한칸 ++
 }
 
+//입력받은 애들 프린트
 void print(int *start, int *finish)
 {
 	for (int i = *start; i <= *finish; i++) {
@@ -570,3 +572,121 @@ void print(int *start, int *finish)
 //A(x) = 21.000000x^9 +9.000000x^5 +5.000000x^3 +5.000000x^3 +5.000000x^3 +
 //B(x) = 5.000000x^3 +5.000000x^2 +5.000000x^2 +
 //D(x) = 21.000000x^9 +9.000000x^5 +5.000000x^3 +5.000000x^3 +5.000000x^3 +5.000000x^3 +5.000000x^2 +% 
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define COMPARE(x,y) ((x) < (y)) ? -1 : ((x) == (y) ? 0 : 1)
+#define MAX_TERMS 100
+#define EXIT_FAILURE 1
+typedef struct 
+{
+	int coef; //계수
+	int expon; //지수
+}term;
+
+term terms[MAX_TERMS];
+int avail =0;
+
+void attach(int coefficient, int exponent);
+void padd(int startA, int finishA, int startB, int finishB, int *startD, int *finishD);
+void print(int *start,int *finish);
+
+int main(void)
+{
+	int i;
+	int  startA, finishA, startB, finishB, startD, finishD;
+
+	printf("D(x) = a(x) * b(x)\n");
+	printf("a(x) 계수입력하시오 : ");
+	scanf("%d",&finishA);
+	printf("B(x) 계수입력하시오 : ");
+	scanf("%d",&finishB);
+
+	startA = 0;
+	printf("input A(X)  ex 10 3 : \n");
+	for (i = 0; i < finishA; i++){
+		scanf("%d %d",&terms[i].coef,&terms[i].expon);
+	}
+	finishA -= 1; // 배열은 0 부터 시작하기 떄문에 입력수 -1
+
+	startB = finishA + 1; //a 끝나고 다음부터 입력
+	printf("input B(X)  ex 10 3 : \n");
+	for (i = 0; i < finishB; i++){
+		scanf("%d %d",&terms[startB+i].coef,&terms[startB+i].expon); //당연히 b부터 시작하니까 b+i
+	}
+	finishB = startB + finishB - 1; //ㅇㅇ 말그대로 b 시작하고 b 끝난거 -1
+
+	padd(startA, finishA, startB, finishB, &startD, &finishD);
+	printf("a(x) =");
+	print(&startA,&finishA);
+	printf("\n");
+	printf("B(x) =");
+	print(&startB,&finishB);
+	printf("\n");
+	printf("\n");
+
+	printf("D(x) =");
+	print(&startD,&finishD);
+
+
+
+}
+
+void padd(int startA, int finishA, int startB, int finishB, int *startD, int *finishD)
+{// a + b = d
+	float coefficient;
+	*startD = avail;
+
+	while (startA <= finishA && startB <= finishB)
+		switch(COMPARE(terms[startA].expon,
+					   terms[startB].expon)){
+			case -1: //a 지수가 b지수보다 작을경우에 b 1칸 증가시켜줌
+				attach(terms[startB].coef,terms[startB].expon);	
+				startB++;
+				break;
+			case 0: //지수가 같은 경우 계수 더해줌
+				coefficient = terms[startA].coef + 
+							  terms[startB].coef;
+				if(coefficient)
+					attach(coefficient, terms[startA].expon); //0인지 확인하고 아니라면 +
+				startA++;
+				startB++;
+				break;
+			case 1: // a지수가 b지수보다 큰 경우에 a배열 1 더해줌
+				attach(terms[startA].coef,terms[startA].expon);
+				startA++;
+		}
+
+	for(; startA <= finishA; startA++){//에 항들 넣는다
+		attach(terms[startA].coef,terms[startA].expon);
+	}
+	for(; startB <= finishB; startB++){ //시작b부터 끝b까지 지우면서 붙여감
+		attach(terms[startB].coef, terms[startB].expon);
+	}
+	*finishD = avail-1;
+}
+
+void attach(int coefficient, int exponent)
+{	
+	if(avail >= MAX_TERMS){
+		fprintf(stderr,"too many terms in the polynomial \n");
+		exit(EXIT_FAILURE);
+	}
+	terms[avail].coef = coefficient;
+	terms[avail++].expon = exponent;
+}
+
+void print(int *start, int *finish)
+{
+	for (int i = *start; i <= *finish; i++) {
+		if (terms[i].expon != 0) {
+			printf("%dx^%d +", terms[i].coef, terms[i].expon);
+		}
+		else {
+			printf("%d", terms[i].coef);
+		}
+	}
+
+}
