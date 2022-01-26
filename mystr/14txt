@@ -1,0 +1,116 @@
+//1번
+#include <stdio.h>
+
+#define max_size 100
+
+void string_change(char string[], char swap[]);
+
+int main(void)
+{
+	char string[max_size] = {0,};
+	char swap[max_size] = {0,};
+	
+	scanf("%s", string);
+	string_change(string,swap);
+}
+
+void string_change(char string[], char swap[])
+{
+	int i;
+
+	for(i = 0; i < max_size; i++){
+		swap[i] = string[max_size - i-1];
+	}
+	
+	for(i = 0; i < max_size; i++){
+		printf("%c",swap[i]);
+	}
+}
+
+//2 번
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+	int num = 0;
+	char cStr[100] = "1234";
+
+	num = atoi(cStr); //atoi 정수형으로 전환
+	
+	printf("%d\n", num + 15);
+	
+	return 0;
+}
+
+//3번
+#include <stdio.h>
+#include <string.h>
+
+#define password_size 100
+
+void size_checkPassword(int size,char password1[],char password2[]);
+
+int main(void)
+{
+	char password1[password_size];
+	char password2[password_size];
+
+	scanf("%s",password1);
+	scanf("%s",password1);
+
+	size_checkPassword(strlen(password1),password1,password2);
+}
+
+void size_checkPassword(int size,char password1[],char password2[])
+{
+	int i,j, count = 0;
+
+	for(i = 0; i < size; i++){
+		count++;
+	}
+
+	if(count < 4 || count > 10){
+		printf("Retry");
+	}else if(count > 4 || count < 10){
+		for(i = 0; i < size; i ++){
+			printf("*");
+		}
+		printf("\n");
+		for(i = 0; i < size; i ++){
+			printf("*");
+		}
+	}	
+
+}
+
+//4번
+#include <stdio.h>
+#include <ctype.h>
+
+int main(void)
+{
+	int i,j,cnt = 0;
+	char line[3][81];
+	char sum[81];
+	for(i = 0; i < 3; i++) {
+    	 gets(line[i]);	
+	}
+
+	for ( i = 0; i < 3; i++){
+		for(j = 0; j < 81; j++){
+			if(line[i][j] =='\0') 
+			break;
+			if(line[i][j] != 0){  
+				if(ispunct(line[i][j])){
+					sum[cnt] = line[i][j];
+					cnt++;
+				}
+			}
+		}
+	}
+	
+	printf("%d\t",cnt);
+	printf("%s",sum);
+
+}
