@@ -1,0 +1,552 @@
+// LIFO last in first out
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_STACK_SIZE 5
+#define MAX_NAME_SIZE 10
+
+typedef struct {
+	int id; // unique id
+	char name [MAX_NAME_SIZE]; // last name
+} element;
+
+element stack[MAX_STACK_SIZE];
+int top = -1; //stack 에 ++ 하면서 입력 0을 가르킴
+
+element stackEmpty() //원소 없는지
+{
+	fprintf(stderr, "stack is empty, cannot delete element.\n");
+	element err;
+	err.id = -1;
+	exit(EXIT_FAILURE);
+	return err;
+}
+
+element pop() { //삭제
+	if (top == -1) 
+		return stackEmpty();
+	
+	return stack[top--];
+}
+
+void stackFull() //스택 다 찼는지
+{
+	fprintf(stderr, "Stack is full, cannot add element\n");
+
+	printf("current stack elements : \n");
+	while (top > -1)
+	{
+		element item = pop();
+		printf("%d %s\n", item.id, item.name);
+	}
+
+	exit(0);
+}
+
+void push(element item) //스택에 넣기
+ {
+	if (top >= MAX_STACK_SIZE - 1)
+		stackFull();
+		
+	stack[++top] = item;
+}
+
+int main(void) 
+{
+	char input[100]; 
+	char *delimiter = " "; // 띄어쓰기로 구분
+	char *op = NULL; // push or pop
+	element student;
+
+	printf("<< stack operations where MAX_STACK_SIZE is 5>>\n");
+	printf("push 1 Jung\n");
+	printf("pop\n\n");
+	printf("**************************************************\n");
+
+	while (1)
+	{
+		gets(input); // ex. push 1 Jung   과 같은 string을 input에 저장
+		op = strtok(input, delimiter); // 토큰을 통해 push, pop을 구분한다.
+
+		if (!strcmp(op, "push"))
+		{
+			//input의 내용을 %d %s에 나눠서 저장한다.
+			sscanf(input + strlen(op) + 1, "%d %s", &student.id, student.name); // 숫자 입력되기전 자름
+			push(student);
+		}
+		else if (!strcmp(op, "pop"))
+		{
+			element item = pop();
+		}
+		else
+			printf("wrong command! try again!\n");
+	}
+
+
+	return 0;
+}
+
+//gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//push 1 jin
+//push 2 jin
+//pop
+//push 3 jing
+//push 4 kinmg
+//pop
+//push 5 kma
+//push 6 ka
+//push 7 asd
+//push 8 asd
+//
+//
+//warning: this program uses gets(), which is unsafe.
+//stack fullcurrent stack elements : 
+//7 asd
+//6 ka
+//5 kma
+//3 jing
+//1 jin\
+
+
+2.
+// FIFO
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_QUEUE_SIZE 5
+#define MAX_NAME_SIZE 10
+
+typedef struct {
+	int id;
+	char name[MAX_NAME_SIZE];
+}element;
+
+element queue[MAX_QUEUE_SIZE];
+int rear = -1;
+int front = -1;
+
+element queueEmpty() 
+{
+	fprintf(stderr, "queue is empty, cannot delete element.\n");
+	element err;
+	err.id = -1;
+	exit(EXIT_FAILURE);
+	return err;
+}
+
+element deleteq()
+{
+	if(front == rear)
+		return queueEmpty();
+
+	return queue[++front];
+}
+
+void queueFull() 
+{
+	fprintf(stderr,"Queue is full, cannot add element!\n");
+	exit(EXIT_FAILURE);
+}
+
+void addq(element item) 
+ {
+	if (rear == MAX_QUEUE_SIZE -1)
+		queueFull();
+		
+	queue[++rear] = item;
+}
+
+void qprint()
+{
+	int i;
+	for (i = front+1; i <= rear; i++)
+		printf("%d %s\n", queue[i].id, queue[i].name);
+	printf("\n");
+}
+
+
+int main(void)
+{
+	printf("<< linear queue oprations where MAX_QUEUE_SIZE is 3>>\n");
+	printf("add 1 Jung\n");
+	printf("delete\n");
+	printf("printq\n\n");
+	printf("**************************************************\n");
+
+	element student;
+	char input[100];
+	char *op = NULL;
+	char *delimiter = " ";
+
+	while(1)
+	{
+		gets(input);
+		op = strtok(input, delimiter);
+
+		if(!strcmp(op, "add"))
+		{
+			sscanf(input + strlen(op) + 1, "%d %s", &student.id, student.name); // 숫자 입력되기전 자름
+			addq(student);
+		}else if(!strcmp(op, "qprint"))
+		{
+			qprint();
+		}
+		else if(!strcmp(op, "delete"))
+		{	
+			student = deleteq();
+		}else printf("Wrong command! try again!\n");
+			
+	}
+}
+
+//gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+//<< linear queue oprations where MAX_QUEUE_SIZE is 3>>
+//add 1 Jung
+//delete
+//printq
+//
+//**************************************************
+//warning: this program uses gets(), which is unsafe.
+//add 1 asdf
+//add 3 sga
+//add 5 asdl
+//qprint
+//1 asdf
+//3 sga
+//5 asdl
+//
+//delete
+//qprint
+//3 sga
+//5 asdl
+//
+//delete
+//qprint
+//5 asdl
+//
+//add 7 lad
+//qprint
+//5 asdl
+//7 lad
+// 환형큐
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MALLOC(p,s)\
+	if(!((p) = malloc(s))){\
+		fprintf(stderr, "Insufficient memory");\
+		exit(EXIT_FAILURE);\
+	}
+
+#define MAX_NAME_SIZE 10
+#define MAX_QUEUE_SIZE 3
+
+typedef struct { 
+	int id;
+	char name[MAX_NAME_SIZE];
+} element;
+element *queue;
+
+int capacity = 2; 
+int rear = 0;
+int front = 0;
+int count =0;
+
+element queueEmpty() 
+{
+	fprintf(stderr, "queue is empty, cannot delete element.\n");
+	element err;
+	err.id = -1;
+	exit(EXIT_FAILURE);
+	return err;
+}
+
+
+element deleteq()
+{
+	element item;
+	if(front == rear)
+		return queueEmpty();
+		
+	front = (front + 1) % MAX_QUEUE_SIZE;
+	return queue[front];
+}
+
+void copy(element* a, element* b, element* c)
+{
+	while (a != b)
+		*c++ = *a++;
+}
+
+void queueFull() {
+	int start;
+	element* newQueue;
+	MALLOC(newQueue, 2 * capacity * sizeof(*queue));
+
+	start = (front + 1) % capacity;
+	if (start < 2)
+		copy(queue + start, queue + start + capacity - 1, newQueue);
+	else {
+		copy(queue + start, queue + capacity, newQueue);
+		copy(queue, queue + rear + 1, newQueue + capacity - start);
+	}
+
+	front = 2 * capacity - 1;
+	rear = capacity - 1;
+	capacity *= 2;
+	free(queue);
+	queue = newQueue;
+
+}
+
+void addq(element item)
+{
+	rear = (rear + 1) % capacity;
+	if(front == rear)
+		queueFull();
+
+	queue[rear] = item;
+}
+
+
+void qprint()
+{
+	int i;
+	for (i = 0 + count; i <= rear; i++)
+		printf("%d,  %s\n", queue[i].id, queue[i].name);
+	printf("\n");
+}
+int main(void)
+{
+	printf("<< linear queue oprations where MAX_QUEUE_SIZE is 3>>\n");
+	printf("add 1 Jung\n");
+	printf("delete\n");
+	printf("printq\n\n");
+	printf("**************************************************\n");
+
+	element student;
+	char input[100];
+	char *op = NULL;
+	char *delimiter = " ";
+
+	queue = (element*)malloc(sizeof(element) *(MAX_QUEUE_SIZE + 1));
+
+	while(1)
+	{
+		gets(input);
+		op = strtok(input, delimiter);
+
+		if(!strcmp(op, "add"))
+		{	
+			sscanf(input + strlen(op) + 1, "%d %s", &student.id, student.name); // 숫자 입력되기전 자름
+			addq(student);
+		}else if(!strcmp(op, "qprint"))
+		{
+			qprint();
+		}
+		else if(!strcmp(op, "delete"))
+		{	
+			element item = deleteq();
+			count++;
+		}else printf("Wrong command! try again!\n");
+			
+	}
+}
+
+//<< linear queue oprations where MAX_QUEUE_SIZE is 3>>
+add 1 Jung
+delete
+printq
+
+**************************************************
+warning: this program uses gets(), which is unsafe.
+add 1 adsf
+add 23 adsf
+queue capacity is doubled.
+current queue capacity is 4.
+add 4 asf
+qprint
+1,  adsf
+23,  adsf
+4,  asf
+
+delete
+qprint
+23,  adsf
+4,  asf
+
+delete
+qprint
+4,  asf
+
+delete 
+queue is empty, cannot delete element.
+
+
+//환형큐 동적할당
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MALLOC(p,s)\
+	if(!((p) = malloc(s))){\
+		fprintf(stderr, "Insufficient memory");\
+		exit(EXIT_FAILURE);\
+	}
+
+#define MAX_NAME_SIZE 10
+#define MAX_QUEUE_SIZE 3
+
+typedef struct { 
+	int id;
+	char name[MAX_NAME_SIZE];
+} element;
+element *queue;
+
+int capacity = 2; 
+int rear = 0;
+int front = 0;
+int count =0;
+
+element queueEmpty() 
+{
+	fprintf(stderr, "queue is empty, cannot delete element.\n");
+	element err;
+	err.id = -1;
+	exit(EXIT_FAILURE);
+	return err;
+}
+
+
+element deleteq()
+{
+	element item;
+	if(front == rear)
+		return queueEmpty();
+		
+	front = (front + 1) % MAX_QUEUE_SIZE;
+	return queue[front];
+}
+
+void copy(element* a, element* b, element* c)
+{
+	while (a != b)
+		*c++ = *a++;
+}
+
+void queueFull() {
+	int start;
+	element* newQueue;
+	MALLOC(newQueue, 2 * capacity * sizeof(*queue));
+
+	start = (front + 1) % capacity;
+	if (start < 2)
+		copy(queue + start, queue + start + capacity - 1, newQueue);
+	else {
+		copy(queue + start, queue + capacity, newQueue);
+		copy(queue, queue + rear + 1, newQueue + capacity - start);
+	}
+
+	front = 2 * capacity - 1;
+	rear = capacity - 1;
+	capacity *= 2;
+	free(queue);
+	queue = newQueue;
+
+	printf("queue capacity is doubled.\n");
+	printf("current queue capacity is %d.\n", capacity);
+}
+
+void addq(element item)
+{
+	rear = (rear + 1) % capacity;
+	if(front == rear)
+		queueFull();
+
+	queue[rear] = item;
+}
+
+
+void qprint()
+{
+	int i;
+	for (i = 0 + count; i <= rear; i++)
+		printf("%d,  %s\n", queue[i].id, queue[i].name);
+	printf("\n");
+}
+int main(void)
+{
+	printf("<< linear queue oprations where MAX_QUEUE_SIZE is 3>>\n");
+	printf("add 1 Jung\n");
+	printf("delete\n");
+	printf("printq\n\n");
+	printf("**************************************************\n");
+
+	element student;
+	char input[100];
+	char *op = NULL;
+	char *delimiter = " ";
+
+	queue = (element*)malloc(sizeof(element) *(MAX_QUEUE_SIZE + 1));
+
+	while(1)
+	{
+		gets(input);
+		op = strtok(input, delimiter);
+
+		if(!strcmp(op, "add"))
+		{	
+			sscanf(input + strlen(op) + 1, "%d %s", &student.id, student.name); // 숫자 입력되기전 자름
+			addq(student);
+		}else if(!strcmp(op, "qprint"))
+		{
+			qprint();
+		}
+		else if(!strcmp(op, "delete"))
+		{	
+			element item = deleteq();
+			count++;
+		}else printf("Wrong command! try again!\n");
+			
+	}
+}
+
+<< linear queue oprations where MAX_QUEUE_SIZE is 3>>
+add 1 Jung
+delete
+printq
+
+**************************************************
+warning: this program uses gets(), which is unsafe.
+add 1 adf
+add 2 asdf
+queue capacity is doubled.
+current queue capacity is 4.
+add asf
+add asdf
+queue capacity is doubled.
+current queue capacity is 8.
+qprint
+1,  adf
+2,  asdf
+2,  asdf
+2,  asdf
+
+deleteq
+Wrong command! try again!
+delete
+qprint
+2,  asdf
+2,  asdf
+2,  asdf
+
+delete
+qprint
+2,  asdf
+2,  asdf
