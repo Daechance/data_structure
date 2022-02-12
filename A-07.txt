@@ -1,0 +1,218 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_STACK_SIZE 100
+#define MAX_ROW_SIZE 10
+#define MAX_COL_SIZE 10
+#define TRUE 1
+#define FALSE 0
+
+int maze[MAX_ROW_SIZE + 2][MAX_COL_SIZE + 2]; //겉 테두리 1로 도배
+int mark[MAX_ROW_SIZE + 2][MAX_COL_SIZE + 2] = {0,};
+
+typedef struct {
+	short int row;
+	short int col;
+	short int dir;
+}element;
+
+element stack[MAX_STACK_SIZE];
+int top = -1;
+
+typedef struct {
+	short int vert;
+	short int horiz;
+} offsets;
+
+offsets move[8] = { {-1, 0}, {-1, 1}, {0, 1}, {1, 1}, {1, 0}, {1, -1}, {0, -1}, {-1, -1} }; // 방향키
+
+int EXIT_ROW;
+int EXIT_COL;
+
+element stackEmpty() {
+	fprintf(stderr, "stack is empty, cannot delete element.\n");
+	element err;
+	exit(EXIT_FAILURE);
+	return err;
+}
+
+void stackFull() {
+	fprintf(stderr, "stack is full, cannot add element\n");
+	exit(EXIT_FAILURE);
+}
+
+element pop() {
+	if (top == -1)
+		return stackEmpty();
+
+	return stack[top--];
+}
+
+void push(element item) {
+	if (top >= MAX_STACK_SIZE - 1)
+		stackFull();
+	stack[++top] = item;
+}
+
+void path()
+{
+	/*output a path throught the maze if such a path exists*/
+	int i, row, col, nextRow, nextCol, dir, found = FALSE;
+	element position;
+
+	mark[1][1] = 1, top = 0;
+	stack[0].row = 1, stack[0].col = 1, stack[0].dir = 1; //(1, 1, 1)로 초기화
+
+	while (top > -1 && !found) { //스택 0 이며 찾을 떄 까지
+		position = pop(); //top --
+		row = position.row;  
+		col = position.col;
+		dir = position.dir;
+
+		while (dir < 8 && !found) { //출구 찾기 전까지 8방향 다보고
+			//다음 칸 방향만큼 좌표 더해서 들어갈 수 있는지 found인지  확인
+			nextRow = row + move[dir].vert;
+			nextCol = col + move[dir].horiz;
+
+			if (nextRow == EXIT_ROW && nextCol == EXIT_COL) 
+				found = TRUE;
+				//!maze[nextrow][nextcol] 갈수 없는 곳이 아닐떄 && 마크도 들린곳이 아닐때
+			else if (!maze[nextRow][nextCol] && !mark[nextRow][nextCol]) {//다음 위치 성공이며 갈수 있는지 확인
+				mark[nextRow][nextCol] = 1;
+				position.row = row;
+				position.col = col;
+				position.dir = ++dir;
+				push(position);
+				row = nextRow;
+				col = nextCol;
+				dir = 0;
+			}
+			else ++dir; //0 찾을 떄 까지 방향 올리고
+		}
+	}
+	if (found) {
+		printf("The path is : \n");
+		printf("row col \n");
+		for (i = 0; i <= top; i++)
+			printf("%2d%5d\n", stack[i].row, stack[i].col);
+		printf("%2d%5d\n", row, col);
+		printf("%2d%5d\n", EXIT_ROW, EXIT_COL);
+	}
+	else
+		printf("The maze does not have a path\n");
+}
+
+int main(void)
+{
+	int i, j;
+	int row, col;
+	FILE *fp = fopen("input.txt", "r");
+
+	fscanf(fp, "%d%d", &row, &col);
+
+	for (i = 0; i <= row + 1; i++){
+		for (j = 0; j <= col + 1; j++){
+			// 테두리 부분 1로 처리
+			if (i == 0 || i == row + 1 || j == 0 || j == col + 1)
+				maze[i][j] = 1;
+			else
+				fscanf(fp, "%d", &maze[i][j]);
+		}
+	}
+
+	printf("input.txt \n%d %d\n",row,col);
+	for (i = 1; i <= row; i++){
+		for (j = 1; j <= col; j++){
+			printf("%d ", maze[i][j]);
+		}
+		putchar('\n');
+	}
+
+	EXIT_ROW = row;
+	EXIT_COL = col;
+
+	path();
+	
+	return 0;
+}
+
+gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+input.txt 
+4 5
+0 0 0 1 1 
+1 1 0 0 0 
+1 0 1 1 1 
+1 0 0 0 0 
+The path is : 
+row col 
+ 1    1
+ 1    2
+ 1    3
+ 2    4
+ 2    3
+ 3    2
+ 4    3
+ 4    4
+ 4    5
+ 
+//matrix 1차원 정적을 통해 만들기
+#include <stdio.h>
+
+typedef struct{
+    int row;
+    int col;
+    int value;
+}term;
+
+int main(void)
+{
+    term mat[8] = {
+        {20, 20, 7},
+        {0, 17, 5},
+        {4, 11, 1},
+        {7, 12, 30},
+        {9, 7, 42},
+        {11, 8, 84},
+        {11, 17, 73},
+        {18, 13, 87},
+    };
+
+    int i, j;
+    int cur = 1;
+
+    for(i = 0; i < mat[0].row; i++){
+        for(j = 0; j < mat[0].col; j++){
+            if(mat[cur].row == i && mat[cur].col == j){
+                printf("%3d", mat[cur++].value);
+			}
+            else
+                printf("%3d" , 0);
+        }
+		printf("\n");
+    }
+
+}
+
+//gangdaechan@gangdaechan-ui-MacBookPro test % cc main.c -o main
+//gangdaechan@gangdaechan-ui-MacBookPro test % ./main
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  5  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  1  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0 30  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0 42  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0 84  0  0  0  0  0  0  0  0 73  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0 87  0  0  0  0  0  0
+ // 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
