@@ -1,0 +1,62 @@
+//return 3개
+#include <stdio.h>
+
+void operation(int x, int y, int *returnSum, int *returnSub, int *returnTiems)
+{
+	//sum, sub, times
+	*returnSub = x - y;
+	*returnTiems = x*y;
+	*returnSum = x + y;
+}
+
+int main(void)
+{
+	int sum, sub, times;
+
+	operation(3, 4, &sum, &sub, &times);
+	printf("%d %d %d\n", sum, sub, times);   
+}
+
+//return 2개로 header, header_next 값 불러오기
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MALLOC(p , s)\
+	if(!(p = malloc(s))){\
+		fprintf(stderr,"Insufficient memory");\
+		exit(EXIT_FAILURE);\
+	}
+
+typedef struct listNode *listPointer;
+
+typedef struct listNode{
+	int data;
+	listPointer link;
+}listNode;
+
+listPointer first = NULL, second = NULL;
+
+void create2(listPointer *header, listPointer *header_next)
+{
+	listPointer first, second;
+
+	MALLOC(first, sizeof(*first));
+	MALLOC(second, sizeof(*second));
+
+	second -> link = NULL; //다음은 없음
+	first -> link = second;
+
+	first -> data = 10;
+	second -> data = 20;
+
+	*header = first;
+	*header_next = second;
+}
+int main(void)
+{
+	create2(&first,&second);
+	printf("%d -> %d", first->data, second->data);
+
+	free(second);
+	free(first);
+}
